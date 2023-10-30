@@ -15,6 +15,17 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Criação do arquivo .env
+
+```env
+DB_USER="your_user"
+DB_PASS="your_password"
+DB_HOST="your_host_name"
+DB_DATABASE="your_db_name"
+DB_TABLE="your_table_name"
+SITE_PRATICAGEM="https://www.praticagem-rj.com.br/"
+```
+
 ## Colocando para funcionar
 
 Devido a natureza deste serviço, é necessário que criemos um script main_execute.sh para execução do mesmo da forma correto no ambiente próprio.
