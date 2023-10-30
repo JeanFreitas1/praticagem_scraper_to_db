@@ -18,7 +18,7 @@ try:
     with urlopen(site_praticagem) as response:
         soup = BeautifulSoup(response, 'html.parser')
 
-        start_point = soup.find('span', string='PORTO DO AÇU - T1')
+        start_point = soup.find('span', string=f'PORTO DO AÇU - T1')
         table_ship = start_point.parent.parent.parent.parent.parent.find_all('table')[2]
         barra = start_point.parent.find('div').find('div').get_text(strip=True)
 
@@ -57,7 +57,8 @@ try:
     db_endpoint = os.getenv("DB_ENDPOINT")
 
 
-    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require"
+
+    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require&options=endpoint%3D{db_endpoint}"
     
     engine = create_engine(db_url)
 
