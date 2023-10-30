@@ -1,0 +1,6 @@
+pandas
+sqlalchemy
+python-dotenv
+beautifulsoup4
+urllib3
+psycopg2
