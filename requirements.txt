@@ -1,5 +1,4 @@
 pandas
-greenlet
 sqlalchemy
 python-dotenv
 beautifulsoup4
