@@ -54,9 +54,10 @@ try:
     db_database = os.getenv("DB_DATABASE")
     db_host = os.getenv("DB_HOST")
     table_name = os.getenv("DB_TABLE")
+    db_endpoint = os.getenv("DB_ENDPOINT")
 
 
-    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require"
+    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require?options=endpoint%3D{db_endpoint}"
     
     engine = create_engine(db_url)
 
