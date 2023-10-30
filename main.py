@@ -65,6 +65,24 @@ try:
 
     df = df.loc[:,~df.columns.duplicated()]
 
+    df["POB"] = "2023/" + df["POB"]
+
+    df["POB"] = pd.to_datetime(df["POB"], format="%Y/%d/%m %H:%M")
+
+    df["CALADO"] = df["CALADO"].str.replace(",",".", regex=False)
+    df["LOA"] = df["LOA"].str.replace(",",".", regex=False)
+    df["BOCA"] = df["BOCA"].str.replace(",",".", regex=False)
+    df["GT"] = df["GT"].str.replace(",",".", regex=False)
+    df["DWT"] = df["DWT"].str.replace(",",".", regex=False)
+
+
+    df["CALADO"] = pd.to_numeric(df["CALADO"])
+    df["LOA"] = pd.to_numeric(df["LOA"])
+    df["BOCA"] = pd.to_numeric(df["BOCA"])
+    df["GT"] = pd.to_numeric(df["GT"])
+    df["DWT"] = pd.to_numeric(df["DWT"])
+
+
     db_user = os.getenv("DB_USER")
     db_pass = os.getenv("DB_PASS")
     db_database = os.getenv("DB_DATABASE")
@@ -77,6 +95,20 @@ try:
     db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require&options=endpoint%3D{db_endpoint}"
     
     engine = create_engine(db_url)
+
+    # Create a connection
+    connection = engine.connect()
+
+    # Use a raw SQL DELETE statement to delete all rows from the table
+    delete_statement = f"DELETE FROM {table_name}"  # Replace with the name of your table
+
+    # Execute the DELETE statement
+    connection.execute(delete_statement)
+
+    # Close the connection
+    connection.close()
+
+
 
 
     df.to_sql(table_name, engine, if_exists='replace', index=False)
