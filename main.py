@@ -6,8 +6,24 @@ import os
 import dotenv
 dotenv.load_dotenv()
 import traceback
+from datetime import datetime
+import logging
 
+log_file = "file.log"
+log_format = "%(asctime)s - %(levelname)s - %(message)s"
 
+# Define the log file name and log format
+log_file = "file.log"
+log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+# Create the log file if it doesn't exist
+if not os.path.exists(log_file):
+    with open(log_file, "w"):
+        pass
+
+# Configure the logging settings
+logging.basicConfig(filename=log_file, level=logging.INFO, format=log_format)
+    
 
 
 try:
@@ -66,8 +82,11 @@ try:
     df.to_sql(table_name, engine, if_exists='replace', index=False)
     engine.dispose()
 
+    logging.info(f"Executado com sucesso!")
+
 
 
 except Exception as e:
     print(e)
     traceback.print_exc()
+    logging.error(f"message: {e}")

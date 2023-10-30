@@ -1,5 +1,6 @@
 pandas
 sqlalchemy
+logging
 python-dotenv
 beautifulsoup4
 urllib3
