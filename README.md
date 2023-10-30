@@ -14,6 +14,7 @@ Este script tem como objetivo realizar o webscraping do site da praticagem RJ, t
  apt-get install python3-venv
  sudo apt-get install libpq-dev
  sudo apt-get install python3-dev
+ sudo apt-get install python3-pip
  ```
 
 
@@ -24,7 +25,7 @@ Utilize os comandos abaixo para realizar a criação do ambiente virtual, ativa�
 ```bash
 python3 -m venv venv 
 source venv/bin/activate
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Criação do arquivo .env
@@ -52,7 +53,7 @@ source ~/praticagem_scraper_to_db/venv/bin/activate
 cd ~/praticagem_scraper_to_db
 
 # Execute o script Python
-python main.py
+python3 main.py
 ```
 
 ## Utilizando o Cron para manter o serviço em execução continua

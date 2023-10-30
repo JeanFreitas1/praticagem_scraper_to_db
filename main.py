@@ -56,7 +56,7 @@ try:
     table_name = os.getenv("DB_TABLE")
 
 
-    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}"
+    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require"
     
     engine = create_engine(db_url)
 
