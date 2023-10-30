@@ -5,12 +5,24 @@ Este script tem como objetivo realizar o webscraping do site da praticagem RJ, t
  ![Imagem da Tabela](./praticagem.png)
 
 
+ # Preparando o Ubuntu
+
+ Instale alguns packages antes como o python3 e o envpython3
+
+ ```
+ apt-get install python3
+ apt-get install python3-venv
+ sudo apt-get install libpq-dev
+ sudo apt-get install python3-dev
+ ```
+
+
 ## Instalação no Linux / Ubuntu
 
 Utilize os comandos abaixo para realizar a criação do ambiente virtual, ativação e instalação das dependencias necessárias.
 
 ```bash
-python -m venv venv 
+python3 -m venv venv 
 source venv/bin/activate
 pip install -r requirements.txt
 ```

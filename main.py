@@ -41,7 +41,7 @@ try:
     # print(barra)
 
     df.columns = header
-    df.dropna(subset="POB",inplace=True)
+    df.dropna(subset=["POB"],inplace=True)
 
 
 
