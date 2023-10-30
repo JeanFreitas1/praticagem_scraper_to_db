@@ -57,7 +57,7 @@ try:
     db_endpoint = os.getenv("DB_ENDPOINT")
 
 
-    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require&options=endpoint%3D{db_endpoint}"
+    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require"
     
     engine = create_engine(db_url)
 
