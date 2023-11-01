@@ -1,34 +1,37 @@
 import os
 import traceback
-from datetime import datetime
 import logging
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import pandas as pd
-import dotenv
+from settings import settings as config
 
-dotenv.load_dotenv()
-
-# Define the log file name and log format
-log_file = "file.log"
-log_format = "%(asctime)s - %(levelname)s - %(message)s"
 
 # Create the log file if it doesn't exist
-if not os.path.exists(log_file):
-    with open(log_file, "w"):
+if not os.path.exists(config.log_file):
+    with open(config.log_file, "w"):
         pass
 
 # Configure the logging settings
-logging.basicConfig(filename=log_file, level=logging.INFO, format=log_format)
+logging.basicConfig(
+    filename=config.log_file, level=logging.INFO, format=config.log_format
+)
 
 # now = datetime.now()
 # today_date = datetime.strftime(now, format="%Y-%m-%d")
 
-try:
-    site_praticagem = os.getenv("SITE_PRATICAGEM")
 
-    with urlopen(site_praticagem) as response:
+def format_df_numbers(df: pd.DataFrame, list: list):
+    dfc = df.copy()
+    for i in list:
+        dfc[i] = df[i].str.replace(",", ".", regex=False)
+        dfc[i] = pd.to_numeric(df[i], errors="coerce")
+    return dfc
+
+
+try:
+    with urlopen(config.site_praticagem) as response:
         soup = BeautifulSoup(response, "html.parser")
 
         start_point = soup.find("span", string=f"PORTO DO AÇU - T1")
@@ -47,9 +50,6 @@ try:
     # Create a Pandas DataFrame from the extracted data
     df = pd.DataFrame(data)
 
-    # Print the DataFrame
-    # print(barra)
-
     df.columns = header
     df.dropna(subset=["POB"], inplace=True)
 
@@ -61,47 +61,24 @@ try:
 
     df["POB"] = pd.to_datetime(df["POB"], format="%Y/%d/%m %H:%M")
 
-    df["CALADO"] = df["CALADO"].str.replace(",", ".", regex=False)
-    df["LOA"] = df["LOA"].str.replace(",", ".", regex=False)
-    df["BOCA"] = df["BOCA"].str.replace(",", ".", regex=False)
-    df["GT"] = df["GT"].str.replace(",", ".", regex=False)
-    df["DWT"] = df["DWT"].str.replace(",", ".", regex=False)
+    list_numeric_cols = ["CALADO", "LOA", "BOCA", "GT", "DWT"]
 
-    df["CALADO"] = pd.to_numeric(df["CALADO"])
-    df["LOA"] = pd.to_numeric(df["LOA"])
-    df["BOCA"] = pd.to_numeric(df["BOCA"])
-    df["GT"] = pd.to_numeric(df["GT"])
-    df["DWT"] = pd.to_numeric(df["DWT"])
+    df = format_df_numbers(df, list_numeric_cols)
 
-    db_user = os.getenv("DB_USER")
-    db_pass = os.getenv("DB_PASS")
-    db_database = os.getenv("DB_DATABASE")
-    db_host = os.getenv("DB_HOST")
-    table_name = os.getenv("DB_TABLE")
-    db_endpoint = os.getenv("DB_ENDPOINT")
-
-    db_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_database}?sslmode=require&options=endpoint%3D{db_endpoint}"
+    db_url = f"postgresql://{config.db_user}:{config.db_pass}@{config.db_host}/{config.db_database}?sslmode=require&options=endpoint%3D{config.db_endpoint}"
 
     engine = create_engine(db_url)
+    con = engine.connect()
+    con.execute(text(f"TRUNCATE TABLE {config.db_table}"))
+    con.commit()
+    con.close()
 
-    # Create a connection
-    connection = engine.connect()
-
-    # Use a raw SQL DELETE statement to delete all rows from the table
-    delete_statement = (
-        f"DELETE FROM {table_name}"  # Replace with the name of your table
-    )
-
-    # Execute the DELETE statement
-    connection.execute(delete_statement)
-
-    # Close the connection
-    connection.close()
-
-    df.to_sql(table_name, engine, if_exists="replace", index=False)
+    df.to_sql(config.db_table, engine, if_exists="replace", index=False)
     engine.dispose()
 
     logging.info(f"Executado com sucesso!")
+
+    print("Concluido com sucesso!")
 
 
 except Exception as e:
