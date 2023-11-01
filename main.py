@@ -22,11 +22,11 @@ logging.basicConfig(
 # today_date = datetime.strftime(now, format="%Y-%m-%d")
 
 
-def format_df_numbers(df: pd.DataFrame, list: list):
+def format_df_numbers(df: pd.DataFrame, col_list: list):
     dfc = df.copy()
-    for i in list:
-        dfc[i] = df[i].str.replace(",", ".", regex=False)
-        dfc[i] = pd.to_numeric(df[i], errors="coerce")
+    for i in col_list:
+        dfc[i] = dfc[i].str.replace(",", ".", regex=False)
+        dfc[i] = pd.to_numeric(dfc[i])
     return dfc
 
 
