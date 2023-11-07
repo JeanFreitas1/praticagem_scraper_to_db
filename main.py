@@ -65,7 +65,10 @@ try:
 
     df = format_df_numbers(df, list_numeric_cols)
 
-    db_url = f"postgresql://{config.db_user}:{config.db_pass}@{config.db_host}/{config.db_database}?sslmode=require&options=endpoint%3D{config.db_endpoint}"
+    if config.db_endpoint:
+        db_url = f"postgresql://{config.db_user}:{config.db_pass}@{config.db_host}/{config.db_database}?sslmode=require&options=endpoint%3D{config.db_endpoint}"
+    else:
+        db_url = f"postgresql://{config.db_user}:{config.db_pass}@{config.db_host}/{config.db_database}?sslmode=require"
 
     engine = create_engine(db_url)
     con = engine.connect()
