@@ -35,7 +35,12 @@ try:
         soup = BeautifulSoup(response, "html.parser")
 
         start_point = soup.find("span", string=f"PORTO DO AÇU - T1")
-        table_ship = start_point.parent.parent.parent.parent.parent.find_all("table")[2]
+
+        table_ship = start_point.parent.parent.parent.parent.find_all(
+            "table",
+            recursive=False,  # recursive is used to get only the tables direct inside the element
+        )[2]
+
         barra = start_point.parent.find("div").find("div").get_text(strip=True)
 
         data = []
