@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import create_engine, text
 import pandas as pd
 from settings import settings as config
-
+import datetime
 
 # Create the log file if it doesn't exist
 if not os.path.exists(config.log_file):
@@ -62,7 +62,9 @@ try:
 
     df = df.loc[:, ~df.columns.duplicated()]
 
-    df["POB"] = "2023/" + df["POB"]
+    year_now = datetime.datetime.now().year
+
+    df["POB"] = str(year_now) + "/" + df["POB"]
 
     df["POB"] = pd.to_datetime(df["POB"], format="%Y/%d/%m %H:%M")
 
