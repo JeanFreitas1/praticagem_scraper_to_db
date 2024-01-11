@@ -70,6 +70,12 @@ try:
 
     list_numeric_cols = ["CALADO", "LOA", "BOCA", "GT", "DWT"]
 
+    df = df[
+        (df["MANOBRA"].str.lower() == "entrada")
+        | (df["MANOBRA"].str.lower() == "saída")
+        | (df["MANOBRA"].str.lower() == "saida")
+    ]
+
     df = format_df_numbers(df, list_numeric_cols)
 
     if config.db_endpoint:
