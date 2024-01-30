@@ -1,7 +1,8 @@
 pandas
-sqlalchemy
+sqlalchemy==1.4.39
 logging
 python-dotenv
 beautifulsoup4
 urllib3
 psycopg2
+re

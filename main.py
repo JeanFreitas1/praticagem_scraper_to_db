@@ -86,6 +86,18 @@ try:
     engine = create_engine(db_url)
     con = engine.connect()
     con.execute(text(f"TRUNCATE TABLE {config.db_table}"))
+
+    create_table_query = text(
+        """
+    CREATE TABLE IF NOT EXISTS status_barra (
+        ID SERIAL PRIMARY KEY,
+        datetime TIMESTAMP,
+        string_var VARCHAR(40)
+    )
+"""
+    )
+    con.execute(create_table_query)
+
     con.commit()
     con.close()
 
