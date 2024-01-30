@@ -7,6 +7,7 @@ from sqlalchemy import create_engine, text
 import pandas as pd
 from settings import settings as config
 import datetime
+import re
 
 # Create the log file if it doesn't exist
 if not os.path.exists(config.log_file):
@@ -28,6 +29,20 @@ def format_df_numbers(df: pd.DataFrame, col_list: list):
         dfc[i] = dfc[i].str.replace(",", ".", regex=False)
         dfc[i] = pd.to_numeric(dfc[i])
     return dfc
+
+
+def get_barra(txt: str):
+    data = re.search(r"\d{2}/\d{2}/\d{4} \d{1,2}:\d{2}", txt).group()
+    status = "undefined"
+    if "abert" in txt.lower():
+        status = "Abriu"
+    if "fechad" in txt.lower():
+        status = "Fechou"
+
+    return {
+        "data": datetime.datetime.strptime(data, "%d/%m/%Y %H:%M"),
+        "status": status,
+    }
 
 
 try:
@@ -60,6 +75,8 @@ try:
 
     df["Barra"] = barra
 
+    info = get_barra(barra)
+
     df = df.loc[:, ~df.columns.duplicated()]
 
     year_now = datetime.datetime.now().year
@@ -85,23 +102,46 @@ try:
 
     engine = create_engine(db_url)
     con = engine.connect()
+
+    # Manobras da Praticagem
     con.execute(text(f"TRUNCATE TABLE {config.db_table}"))
-
-    create_table_query = text(
-        """
-    CREATE TABLE IF NOT EXISTS status_barra (
-        ID SERIAL PRIMARY KEY,
-        datetime TIMESTAMP,
-        string_var VARCHAR(40)
-    )
-"""
-    )
-    con.execute(create_table_query)
-
-    con.commit()
-    con.close()
-
     df.to_sql(config.db_table, engine, if_exists="replace", index=False)
+
+    # Criação da tabela de barra caso não exista
+    con.execute(
+        text(
+            """
+        CREATE TABLE IF NOT EXISTS status_barra (
+            ID SERIAL PRIMARY KEY,
+            datetime TIMESTAMP,
+            status VARCHAR(40)
+        )
+    """
+        )
+    )
+
+    # Selecionando a ultima data para comparar se vai inserir um novo registro
+    status_f_db = con.execute(
+        text("SELECT * FROM status_barra ORDER BY ID DESC LIMIT 1")
+    ).fetchone()
+
+    # Função para reduzi o codigo
+    def insert_status(datetime, status):
+        insert_query = text(
+            """
+            INSERT INTO status_barra (datetime, status) VALUES (:datetime, :status)
+        """
+        )
+        con.execute(insert_query, {"datetime": datetime, "status": status})
+
+    if status_f_db == None:
+        insert_status(info["data"], info["status"])
+    else:
+        if status_f_db[1] != info["data"]:
+            insert_status(info["data"], info["status"])
+        else:
+            print("Já existe um registro igual no banco")
+
     engine.dispose()
 
     logging.info(f"Executado com sucesso!")
